@@ -1,7 +1,7 @@
 const { sendEmail, mjml2html } = require("./utils");
 
 module.exports = async function sendGiftCard({ email, aanbieder, message, amount }) {
-  console.log(email)
+  
   try {
     const mjml2html = require("mjml");
     const { html } = mjml2html(`

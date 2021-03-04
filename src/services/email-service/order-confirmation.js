@@ -1,6 +1,6 @@
 const { formatCurrency } = require("../../lib/currency");
 const { orders } = require("../crystallize");
-const { sendEmail, mjml2html } = require("./utils");
+const { sendEmail} = require("./utils");
 
 module.exports = async function sendOrderConfirmation(orderId) {
   try {
@@ -15,6 +15,8 @@ module.exports = async function sendOrderConfirmation(orderId) {
       };
     }
 
+    const mjml2html = require("mjml");
+
     const { html } = mjml2html(`
       <mjml>
         <mj-body>
@@ -22,14 +24,14 @@ module.exports = async function sendOrderConfirmation(orderId) {
           <mj-column>
             <mj-text>
               <h1>Order Summary</h1>
-              <p>Thanks for your order! This email contains a copy of your order for your reference.</p>
+              <p>Bedankt voor je bestelling! Deze email bevat een kopie van je bestelling voor referentie.</p>
               <p>
-                Order Number: <strong>#${order.id}</strong>
+                Bestelnummer: <strong>#${order.id}</strong>
               </p>
               <p>
-                First name: <strong>${order.customer.firstName}</strong><br />
-                Last name: <strong>${order.customer.lastName}</strong><br />
-                Email address: <strong>${email}</strong>
+                Voornaam: <strong>${order.customer.firstName}</strong><br />
+                Naam: <strong>${order.customer.lastName}</strong><br />
+                Email: <strong>${email}</strong>
               </p>
               <p>
                 Total: <strong>${formatCurrency({
@@ -40,9 +42,9 @@ module.exports = async function sendOrderConfirmation(orderId) {
             </mj-text>
             <mj-table>
               <tr style="border-bottom: 1px solid #ecedee; text-align: left;">
-                <th style="padding: 0 15px 0 0;">Name</th>
-                <th style="padding: 0 15px;">Quantity</th>
-                <th style="padding: 0 0 0 15px;">Total</th>
+                <th style="padding: 0 15px 0 0;">Naam</th>
+                <th style="padding: 0 15px;">Hoeveelheid</th>
+                <th style="padding: 0 0 0 15px;">Totaal</th>
               </tr>
               ${order.cart.map(
                 (item) => `<tr>
@@ -65,7 +67,7 @@ module.exports = async function sendOrderConfirmation(orderId) {
 
     await sendEmail({
       to: email,
-      subject: "Order summary",
+      subject: "Bestelgegevens",
       html,
     });
 
