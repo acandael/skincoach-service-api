@@ -3,9 +3,9 @@ const voucherService = require("../voucher-service");
 
 module.exports = {
   async get({ basketModel, context }) {
-    const { locale, voucherCode, ...basketFromClient } = basketModel;
+    const { locale, voucherCode, ...basketFromClient} = basketModel;
     const { user } = context;
-
+    
     /**
      * Resolve all the voucher codes to valid vouchers for the user
      */
@@ -53,6 +53,7 @@ module.exports = {
           ) || variant.priceVariants.find((p) => p.identifier === "default");
 
         const gross = price;
+
         const net = (price * 100) / (100 + vatType.percent);
 
         return {
@@ -82,7 +83,7 @@ module.exports = {
 
         return acc;
       },
-      { gross: 0, net: 0, tax: 0, currency: "N/A" }
+      { gross: 0, net: 0, tax: 0, currency: "N/A"}
     );
     total.tax = vatType;
 

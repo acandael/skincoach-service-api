@@ -8,6 +8,9 @@ module.exports = async function sendOrderConfirmation(orderId) {
 
     const { email } = order.customer.addresses[0];
 
+    const additionalInformation = JSON.parse(order.additionalInformation)
+    const {shipping} = additionalInformation.order_metadata
+
     if (!email) {
       return {
         success: false,
@@ -23,7 +26,7 @@ module.exports = async function sendOrderConfirmation(orderId) {
         <mj-section>
           <mj-column>
             <mj-text>
-              <h1>Order Summary</h1>
+              <h1>Bestelgegevens</h1>
               <p>Bedankt voor je bestelling! Deze email bevat een kopie van je bestelling voor referentie.</p>
               <p>
                 Bestelnummer: <strong>#${order.id}</strong>
@@ -33,9 +36,15 @@ module.exports = async function sendOrderConfirmation(orderId) {
                 Naam: <strong>${order.customer.lastName}</strong><br />
                 Email: <strong>${email}</strong>
               </p>
+              ${shipping ? `<p>
+                Verzendkosten: <strong>${formatCurrency({
+                  amount: 8,
+                  currency: order.total.currency,
+                })}</strong>
+              </p>` : `<p>Geen verzendkosten (ophalen in winkel)</p>`}
               <p>
-                Total: <strong>${formatCurrency({
-                  amount: order.total.gross,
+                Totaal: <strong>${formatCurrency({
+                  amount: shipping ? (order.total.gross + 8) : order.total.gross,
                   currency: order.total.currency,
                 })}</strong>
               </p>
