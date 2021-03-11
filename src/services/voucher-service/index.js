@@ -3,33 +3,62 @@
  * You can customise this to call an external service
  * or keep static vouchers like this
  */
-
-const vouchers = [
-  {
-    code: "awesome-deal",
-    discountAmount: null,
-    discountPercent: 99,
-  },
-  {
-    code: "fair-deal",
-    discountAmount: 300,
-    discountPercent: null,
-  },
-];
+ const vouchers = `
+ query {
+  catalogue(path: "/vouchers") {
+    children {
+      ... on Product {
+        id
+        name
+        components {
+          id
+          name
+          type
+          content {
+            ... on ComponentChoiceContent {
+              selectedComponent {
+                id
+                name
+                content {
+                  ... on NumericContent {
+                    number
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+ `
 
 module.exports = {
   get({ code, context }) {
     const { user } = context;
-    const voucher = vouchers.find((v) => v.code === code);
 
-    // Only vouchers for logged in users
-    if (!user.email) {
-      return null;
+    const isAnonymousUser = !user || !user.email;
+
+    // As default, not all the vouchers work for anonymous users.
+    // As you'll see in the configuration above, some need the user to be logged in
+    if (isAnonymousUser) {
+      const voucher = vouchers
+        .filter((v) => !v.onlyForAuthorisedUser)
+        .find((v) => v.code === code);
+
+      return {
+        isValid: Boolean(voucher),
+        voucher,
+      };
     }
 
-    // Lookup voucher in third party system
-    // Todo: example
+    // We assume that none of the vouchers have repeated codes
+    const voucher = vouchers.find((v) => v.code === code);
 
-    return voucher;
+    return {
+      isValid: Boolean(voucher),
+      voucher,
+    };
   },
 };
