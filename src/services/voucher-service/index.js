@@ -3,39 +3,26 @@
  * You can customise this to call an external service
  * or keep static vouchers like this
  */
- const vouchers = `
- query {
-  catalogue(path: "/vouchers") {
-    children {
-      ... on Product {
-        id
-        name
-        components {
-          id
-          name
-          type
-          content {
-            ... on ComponentChoiceContent {
-              selectedComponent {
-                id
-                name
-                content {
-                  ... on NumericContent {
-                    number
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
- `
+
+
+//  const voucherRegister = [
+//   {
+//     code: "no-shipping-cost",
+//     discountAmount: 8,
+//     discountPercent: null,
+//     onlyForAuthorisedUser: false,
+//   }
+// ];
 
 module.exports = {
-  get({ code, context }) {
+  async get({ code, context }) {
+
+    const {
+      getVouchersFromCrystallize,
+    } = require("./get-vouchers-from-crystallize");
+    
+    const vouchers = await getVouchersFromCrystallize();
+
     const { user } = context;
 
     const isAnonymousUser = !user || !user.email;
@@ -45,7 +32,7 @@ module.exports = {
     if (isAnonymousUser) {
       const voucher = vouchers
         .filter((v) => !v.onlyForAuthorisedUser)
-        .find((v) => v.code === code);
+        .find((v) => v.components[0].content.text === code);
 
       return {
         isValid: Boolean(voucher),
