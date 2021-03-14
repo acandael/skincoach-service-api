@@ -10,13 +10,16 @@ function truncateDecimalsOfNumber(originalNumber, numberOfDecimals = 2) {
 function calculateVoucherDiscountAmount({ voucher, amount }) {
   // We assume that the voucher has the right format.
   // It either has `discountPercent` or `discountAmount`
-  const isDiscountAmount = Boolean(voucher.discountAmount);
+  
+  const discountAmount = voucher.components[1].content.selectedComponent.content.number;
 
-  if (isDiscountAmount) {
-    return voucher.discountAmount;
+  const selectedComponent = voucher.components[1].content.selectedComponent;
+
+  if (selectedComponent.name === 'discountAmount') {
+    return discountAmount;
   }
 
-  const amountToDiscount = (amount * voucher.discountPercent) / 100;
+  const amountToDiscount = (amount * discountAmount) / 100;
 
   return truncateDecimalsOfNumber(amountToDiscount);
 }
