@@ -5,6 +5,7 @@ const { sendEmail} = require("./utils");
 module.exports = async function sendOrderConfirmation(orderId) {
   try {
     const order = await orders.getOrder(orderId);
+    const address = order.customer.addresses?.[1];
 
     const { email } = order.customer.addresses[0];
 
@@ -41,10 +42,12 @@ module.exports = async function sendOrderConfirmation(orderId) {
                   amount: 8,
                   currency: order.total.currency,
                 })}</strong>
-              </p>` : `<p>Geen verzendkosten (ophalen in winkel)</p>`}
+              </p>
+              <p>Leveradres: ${address.street} ${address.streetNumber}, ${address.postalCode} ${address.city}</p>
+              ` : `<p>Geen verzendkosten (ophalen in winkel)</p>`}
               <p>
                 Totaal: <strong>${formatCurrency({
-                  amount: shipping ? (order.total.gross + 8) : order.total.gross,
+                  amount: order.total.gross,
                   currency: order.total.currency,
                 })}</strong>
               </p>

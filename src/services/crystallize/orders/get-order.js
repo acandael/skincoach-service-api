@@ -49,6 +49,10 @@ module.exports = async function getOrder(id) {
               addresses {
                 type
                 email
+                street
+                streetNumber
+                postalCode
+                city
               }
             }
           }

@@ -6,13 +6,9 @@ module.exports = async function createPaymentIntent({
 
   const { getClient } = require("./utils");
 
-  const { basketModel, metadata } = checkoutModel;
+  const { basketModel} = checkoutModel;
 
   const basket = await basketService.get({ basketModel, context });
-
-  if (metadata.shipping) {
-    basket.total.gross += 8;
-  }
 
   const paymentIntent = await getClient().paymentIntents.create({
     amount: basket.total.gross * 100,
