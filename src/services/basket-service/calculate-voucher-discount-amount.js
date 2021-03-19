@@ -1,4 +1,3 @@
-
 function truncateDecimalsOfNumber(originalNumber, numberOfDecimals = 2) {
   // toFixed() converts a number into a string by truncating it
   // with the number of decimals passed as parameter.
@@ -10,16 +9,13 @@ function truncateDecimalsOfNumber(originalNumber, numberOfDecimals = 2) {
 function calculateVoucherDiscountAmount({ voucher, amount }) {
   // We assume that the voucher has the right format.
   // It either has `discountPercent` or `discountAmount`
-  
-  const discountAmount = voucher.components[1].content.selectedComponent.content.number;
+  const isDiscountAmount = Boolean(voucher.discountAmount);
 
-  const selectedComponent = voucher.components[1].content.selectedComponent;
-
-  if (selectedComponent.name === 'discountAmount') {
-    return discountAmount;
+  if (isDiscountAmount) {
+    return voucher.discountAmount;
   }
 
-  const amountToDiscount = (amount * discountAmount) / 100;
+  const amountToDiscount = (amount * voucher.discountPercent) / 100;
 
   return truncateDecimalsOfNumber(amountToDiscount);
 }

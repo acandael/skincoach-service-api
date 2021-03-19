@@ -138,10 +138,9 @@ module.exports = {
       total.gross -= discountAmount
       total.discount = discountAmount;
 
-
       // Add the voucher item to the cart
       const voucherCartItem = {
-        name: voucher.components[0].content.text,
+        name: voucher.code,
         quantity: 1,
         price: {
           gross: discountAmount * -1,
@@ -156,10 +155,7 @@ module.exports = {
        * This does not have to be a valid product SKU in
        * Crystallize
        */
-
-      const voucherCode = voucher.components[0].content.text
-
-      const voucherIdentifier = `--voucher--${ voucherCode
+       const voucherIdentifier = `--voucher--${voucher.code
         .toLowerCase()
         .replace(/\s/g, "-")}`;
       voucherCartItem.sku = voucherIdentifier;

@@ -109,10 +109,6 @@ module.exports = {
     `https://api.crystallize.com/${CRYSTALLIZE_TENANT_IDENTIFIER}/orders`
   ),
 
-  callVouchersApi: createApiCaller(
-    `https://api.crystallize.com/${CRYSTALLIZE_TENANT_IDENTIFIER}/catalogue`
-  ),
-
   /**
    * The PIM API is used for doing the ALL possible actions on
    * a tenant or your user profile

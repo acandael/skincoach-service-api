@@ -1,43 +1,82 @@
-async function getVouchersFromCrystallize() {
-  const { callVouchersApi } = require("../crystallize/utils");
+const { callCatalogueApi } = require("../crystallize/utils");
 
-  const response = await callVouchersApi({
-    query: `{
-     catalogue(path: "/vouchers") {
-       children {
-         ... on Product {
-           id
-           name
-           components {
-             id
-             name
-             type
-             content {
-               ... on SingleLineContent {text}
-               ... on ComponentChoiceContent {
-                 selectedComponent {
-                   id
-                   name
-                   content {
-                     ... on NumericContent {
-                       number
-                     }
-                   }
-                 }
-               }
-             }
-           }
-         }
-       }
-     }
-    }`
-  })
+/**
+ * Example of how to use Crystallize to store and
+ * manage vouchers.
+ *
+ * Expected catalogue structure:
+ * _vouchers
+ *  - voucher_1
+ *  - voucher_2
+ *  - ...
+ *  - voucher_n
+ *
+ * Each voucher is based on the following shape
+ * code (singleLine)
+ * discount (choiceComponent)
+ *  - percent (numeric)
+ *  - amount (numeric)
+ */
+module.exports = async function getCrystallizeVouchers() {
+  const vouchersFromCrystallize = await callCatalogueApi({
+    query: `
+      {
+        catalogue(language: "en", path: "/vouchers") {
+          children {
+            name
+            code: component(id: "code") {
+              content {
+                ... on SingleLineContent {
+                  text
+                }
+              }
+            }
+            discount: component(id: "korting") {
+              content {
+                ... on ComponentChoiceContent {
+                  selectedComponent {
+                    id
+                    content {
+                      ... on NumericContent {
+                        number
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+  });
 
-  const vouchers = response.data.catalogue.children;
+  if (
+    !vouchersFromCrystallize.data ||
+    !vouchersFromCrystallize.data.catalogue
+  ) {
+    return [];
+  }
 
-  return vouchers
-}
+  return vouchersFromCrystallize.data.catalogue.children.map(
+    (voucherFromCrystallize) => {
+      const discountComponent =
+        voucherFromCrystallize.discount.content.selectedComponent;
 
-module.exports = {
-  getVouchersFromCrystallize,
+      let discountAmount = null;
+      let discountPercent = null;
+      if (discountComponent.id === "percent") {
+        discountPercent = discountComponent.content.number;
+      } else {
+        discountAmount = discountComponent.content.number;
+      }
+
+      return {
+        code: voucherFromCrystallize.code.content.text,
+        discountAmount,
+        discountPercent,
+        onlyForAuthorisedUser: false,
+      };
+    }
+  );
 };
