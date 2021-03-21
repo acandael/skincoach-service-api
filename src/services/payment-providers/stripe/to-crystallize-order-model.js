@@ -23,6 +23,8 @@ module.exports = async function stripeToCrystallizeOrderModel({
     }
   }
 
+  console.log(basket.total)
+
   return {
     cart: basket.cart,
     total: basket.total,

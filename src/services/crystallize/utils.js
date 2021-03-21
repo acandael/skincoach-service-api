@@ -43,6 +43,8 @@ function createApiCaller(uri) {
 }
 
 function normaliseOrderModel({ customer, cart, total, ...rest }) {
+  const delivery = customer.addresses[1];
+  
   return {
     ...rest,
     ...(total && {
@@ -85,6 +87,13 @@ function normaliseOrderModel({ customer, cart, total, ...rest }) {
             type: "billing",
             email: customer.email || undefined,
           },
+          {
+            type: "delivery",
+            street: delivery.street,
+            streetNumber: delivery.streetNumber,
+            postalCode: delivery.postalCode,
+            city: delivery.city
+          }
         ],
       },
     }),

@@ -163,13 +163,6 @@ module.exports = {
       cart.push(voucherCartItem);
     }
 
-    // // add shipping costs
-    // const shipping = cart.find((cartItem) => cartItem.name === "shipping")
-
-    // if (shipping) {
-    //   total.gross += shipping.price.gross
-    // }
-
     return {
       voucher,
       cart,
