@@ -96,7 +96,7 @@ module.exports = {
 
     // Add a voucher
     let cartWithDiscountedPrice = cart;
-    if (voucher) {
+    if (cart.length > 0 && voucher) {
       const {
         calculateVoucherDiscountAmount,
       } = require("./calculate-voucher-discount-amount");
@@ -120,7 +120,7 @@ module.exports = {
          * is relative to their own portion of the total amount
          */
         
-        const gross = cartItem.price.gross - discountAmount;
+        const gross = cartItem.price.gross - discountAmount * portionOfTotal;
         const net = (gross * 100) / (100 + cartItem.vatType.percent);
 
         return {
@@ -134,7 +134,7 @@ module.exports = {
       });
 
       // Adjust totals
-      // total = getTotals({ cart: cartWithDiscountedPrice, vatType });
+      //total = getTotals({ cart: cartWithDiscountedPrice, vatType });
       total.gross -= discountAmount
       total.discount = discountAmount;
 
