@@ -10,13 +10,29 @@ module.exports = async function sendOrderConfirmation(orderId) {
     const { email } = order.customer.addresses[0];
 
     const additionalInformation = JSON.parse(order.additionalInformation)
-    const {shipping} = additionalInformation.order_metadata
+    const {deliveryMethod} = additionalInformation.order_metadata
 
     if (!email) {
       return {
         success: false,
         error: "No email is conntected with the customer object",
       };
+    }
+
+    function setDeliveryMessage() {
+      if (deliveryMethod === 'shipping') {
+        return `<p>
+        Verzendkosten: <strong>${formatCurrency({
+          amount: 8,
+          currency: order.total.currency,
+        })}</strong>
+      </p>
+      <p>Leveradres: ${address.street} ${address.streetNumber}, ${address.postalCode} ${address.city}</p>
+      `} else if (deliveryMethod === 'pickup') {
+        return `<p>Geen verzendkosten (ophalen in winkel)</p>`
+      } else if (deliveryMethod === 'email') {
+        return `<p>Je kadobon wordt gemaild naar ${email} </p>`
+      }
     }
 
     const mjml2html = require("mjml");
@@ -37,14 +53,7 @@ module.exports = async function sendOrderConfirmation(orderId) {
                 Naam: <strong>${order.customer.lastName}</strong><br />
                 Email: <strong>${email}</strong>
               </p>
-              ${shipping ? `<p>
-                Verzendkosten: <strong>${formatCurrency({
-                  amount: 8,
-                  currency: order.total.currency,
-                })}</strong>
-              </p>
-              <p>Leveradres: ${address.street} ${address.streetNumber}, ${address.postalCode} ${address.city}</p>
-              ` : `<p>Geen verzendkosten (ophalen in winkel)</p>`}
+              ${setDeliveryMessage()}
               <p>
                 Totaal: <strong>${formatCurrency({
                   amount: order.total.gross,
