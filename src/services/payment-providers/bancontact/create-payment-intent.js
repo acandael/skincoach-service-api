@@ -12,7 +12,8 @@ module.exports = async function createPaymentIntent({
 
   const paymentIntent = await getClient().paymentIntents.create({
     amount: basket.total.gross * 100,
-    currency: basket.total.currency
+    currency: basket.total.currency,
+    payment_method_types: ['bancontact']
   });
 
   return paymentIntent;

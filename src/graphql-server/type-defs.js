@@ -94,6 +94,7 @@ module.exports = gql`
     klarna: PaymentProvider!
     vipps: PaymentProvider!
     mollie: PaymentProvider!
+    bancontact: PaymentProvider!
   }
 
   type PaymentProvider {
@@ -183,6 +184,7 @@ module.exports = gql`
 
   type PaymentProvidersMutations {
     stripe: StripeMutations!
+    bancontact: BancontactMutations!
     klarna: KlarnaMutations!
     mollie: MollieMutations!
     vipps: VippsMutations!
@@ -197,6 +199,19 @@ module.exports = gql`
   }
 
   type StripeConfirmOrderResponse {
+    success: Boolean!
+    orderId: String
+  }
+
+  type BancontactMutations {
+    createPaymentIntent(checkoutModel: CheckoutModelInput!): JSON
+    confirmOrder(
+      checkoutModel: CheckoutModelInput!
+      paymentIntentId: String!
+    ): BancontactConfirmOrderResponse!
+  }
+
+  type BancontactConfirmOrderResponse {
     success: Boolean!
     orderId: String
   }

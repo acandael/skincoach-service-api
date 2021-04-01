@@ -5,6 +5,7 @@ const userService = require("../services/user-service");
 const voucherService = require("../services/voucher-service");
 
 const stripeService = require("../services/payment-providers/stripe");
+const bancontactService = require("../services/payment-providers/bancontact");
 const klarnaService = require("../services/payment-providers/klarna");
 const vippsService = require("../services/payment-providers/vipps");
 const mollieService = require("../services/payment-providers/mollie");
@@ -46,6 +47,7 @@ module.exports = {
   },
   PaymentProvidersQueries: {
     stripe: paymentProviderResolver(stripeService),
+    bancontact: paymentProviderResolver(bancontactService),
     klarna: paymentProviderResolver(klarnaService),
     vipps: paymentProviderResolver(vippsService),
     mollie: paymentProviderResolver(mollieService),
@@ -67,6 +69,7 @@ module.exports = {
   },
   PaymentProvidersMutations: {
     stripe: () => ({}),
+    bancontact: () => ({}),
     klarna: () => ({}),
     mollie: () => ({}),
     vipps: () => ({}),
@@ -76,6 +79,12 @@ module.exports = {
       stripeService.createPaymentIntent({ ...args, context }),
     confirmOrder: (parent, args, context) =>
       stripeService.confirmOrder({ ...args, context }),
+  },
+  BancontactMutations: {
+    createPaymentIntent: (parent, args, context) =>
+      bancontactService.createPaymentIntent({ ...args, context }),
+    confirmOrder: (parent, args, context) =>
+      bancontactService.confirmOrder({ ...args, context }),
   },
   KlarnaMutations: {
     renderCheckout: (parent, args, context) =>
