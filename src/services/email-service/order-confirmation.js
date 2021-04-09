@@ -2,6 +2,8 @@ const { formatCurrency } = require("../../lib/currency");
 const { orders } = require("../crystallize");
 const { sendEmail } = require("./utils");
 
+const EMAIL_FROM = process.env.EMAIL_FROM;
+
 module.exports = async function sendOrderConfirmation(orderId) {
   try {
     const order = await orders.getOrder(orderId);
@@ -95,7 +97,7 @@ module.exports = async function sendOrderConfirmation(orderId) {
         <mj-section>
           <mj-column>
             <mj-text>
-              <h1>Bestelgegevens</h1>
+              <h1>Nieuw Bestelling</h1>
               <p>Er werd een nieuwe bestelling geplaatst</p>
               <p>
                 Bestelnummer: <strong>#${order.id}</strong>
@@ -147,7 +149,7 @@ module.exports = async function sendOrderConfirmation(orderId) {
     await sendEmail({
       to: "info@anthonycandaele.com",
       subject: "Nieuwe Bestelling",
-      html2,
+      html: html2,
     });
 
     return {
