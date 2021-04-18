@@ -159,7 +159,7 @@ module.exports = async function sendOrderConfirmation(orderId) {
     });
 
     await sendEmail({
-      to: "info@anthonycandaele.com",
+      to: "info@anniek-lambrecht.be",
       subject: "Nieuwe Bestelling",
       html: html2,
     });
