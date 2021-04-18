@@ -86,16 +86,18 @@ module.exports = async function sendOrderConfirmation(orderId) {
               )}
             </mj-table>
           </mj-column>
+        </mj-section>
+        <mj-section>
           <mj-column>
-            <mj-image width="240px" src="https://www.anniek-lambrecht.be/static/logo-anniek-lambrecht-header-2.png" />
-          </mj-column>
-          <mj-column>
-          <mj-text>
-            <p>Schoonheidsinstituut Anniek Lambrecht<br>
-            L. Dujardinstraat 9<br>
-            8370 Blankenberge</p>
-          </mj-text>
-          </mj-column>
+          <mj-image width="240px" src="https://www.anniek-lambrecht.be/static/logo-anniek-lambrecht-header-2.png" />
+        </mj-column>
+        <mj-column>
+        <mj-text>
+          <p>Schoonheidsinstituut Anniek Lambrecht<br>
+          L. Dujardinstraat 9<br>
+          8370 Blankenberge</p>
+        </mj-text>
+        </mj-column>
         </mj-section>
         </mj-body>
       </mjml>
