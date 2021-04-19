@@ -49,7 +49,9 @@ module.exports = async function sendOrderConfirmation(orderId) {
           <mj-column>
             <mj-text>
               <h1>Bestelgegevens</h1>
-              <p>Bedankt voor je bestelling! Deze email bevat een kopie van je bestelling voor referentie.</p>
+              <p>Bedankt voor je bestelling! 
+              We maken deze zo spoedig mogelijk klaar voor je.  Graag nog even wachten met ophalen tot je de mail met klaar voor ophalen ontvangen hebt.  
+              Hieronder een kopie van je bestelling voor referentie</p>
               <p>
                 Bestelnummer: <strong>#${order.id}</strong>
               </p>
@@ -93,7 +95,7 @@ module.exports = async function sendOrderConfirmation(orderId) {
         </mj-column>
         <mj-column>
         <mj-text>
-          <p>Schoonheidsinstituut Anniek Lambrecht<br>
+          <p>Anniek Lambrecht Skin Coach<br>
           L. Dujardinstraat 9<br>
           8370 Blankenberge</p>
         </mj-text>
