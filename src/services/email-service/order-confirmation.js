@@ -96,7 +96,7 @@ module.exports = async function sendOrderConfirmation(orderId) {
         <mj-column>
         <mj-text>
           <p>Anniek Lambrecht Skin Coach<br>
-          L. Dujardinstraat 9<br>
+          De Smet De Naeyerlaan 74<br>
           8370 Blankenberge</p>
         </mj-text>
         </mj-column>
