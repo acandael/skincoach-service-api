@@ -19,6 +19,7 @@ jspm_packages/
 .yarn-integrity
 
 # local dotenv environment variables file
+.env
 .env*.local
 
 # OSX Finder folder settings
