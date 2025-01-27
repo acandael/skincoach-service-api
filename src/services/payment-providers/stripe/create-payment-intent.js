@@ -30,6 +30,9 @@ module.exports = async function createPaymentIntent({
   });
 
   try {
+    // Create an idempotency key from basket ID and total
+    const idempotencyKey = `pi_${basketModel.basketId}_${basket.total.gross}`;
+
     // Create payment intent with complete details
     const paymentIntentData = {
       amount: Math.round(basket.total.gross * 100),
@@ -81,7 +84,10 @@ module.exports = async function createPaymentIntent({
     });
 
     const paymentIntent = await getClient().paymentIntents.create(
-      paymentIntentData
+      paymentIntentData,
+      {
+        idempotencyKey, // Add idempotency key to the request
+      }
     );
 
     // Log successful creation
@@ -92,6 +98,7 @@ module.exports = async function createPaymentIntent({
       status: paymentIntent.status,
       hasMetadata: !!paymentIntent.metadata,
       hasShipping: !!paymentIntent.shipping,
+      idempotencyKey,
     });
 
     return paymentIntent;
