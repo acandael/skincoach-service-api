@@ -1,4 +1,5 @@
 const invariant = require("invariant");
+const { REQUIRED_STRIPE_CONFIG } = require("./config");
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 
@@ -11,8 +12,8 @@ module.exports = {
     );
 
     if (!client) {
-      const stripeSdk = require("stripe");
-      client = stripeSdk(STRIPE_SECRET_KEY);
+      const stripe = require("stripe");
+      client = stripe(STRIPE_SECRET_KEY, REQUIRED_STRIPE_CONFIG);
     }
 
     return client;

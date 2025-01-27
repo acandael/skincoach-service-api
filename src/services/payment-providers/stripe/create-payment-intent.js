@@ -30,87 +30,80 @@ module.exports = async function createPaymentIntent({
   });
 
   try {
-    // Create an idempotency key from basket ID and total
-    const idempotencyKey = `pi_${basketModel.basketId}_${basket.total.gross}`;
+    const idempotencyKey = basketModel?.basketId
+      ? `pi_${basketModel.basketId}_${basket.total.gross}`
+      : `pi_${Date.now()}_${basket.total.gross}`;
 
-    // Create payment intent with complete details
+    // Basic payment intent data
     const paymentIntentData = {
       amount: Math.round(basket.total.gross * 100),
       currency: basket.total.currency.toLowerCase(),
       payment_method_types: ["card"],
-      // Ensure metadata is not empty
-      metadata: {
-        basketId: basketModel.basketId || "no_basket_id",
-        crystallizeOrderId: basketModel.crystallizeOrderId || "pending",
-        customerEmail: customer?.email || "no_email",
-      },
-      // Only add customer details if they exist
-      ...(customer?.email && {
-        receipt_email: customer.email,
-        description: `Order for ${customer?.firstName || ""} ${
-          customer?.lastName || ""
-        }`.trim(),
-      }),
-      // Only add shipping if address exists
-      ...(customer?.streetAddress && {
-        shipping: {
-          name: `${customer?.firstName || ""} ${
-            customer?.lastName || ""
-          }`.trim(),
-          address: {
-            line1: customer.streetAddress,
-            postal_code: customer.postalCode || "",
-            city: customer.city || "",
-            country: customer.country || "BE",
-            state: customer.state || null,
-          },
-        },
-      }),
-      automatic_payment_methods: {
-        enabled: true,
-        allow_redirects: "never",
-      },
-      // Add confirmation method
       confirmation_method: "automatic",
-      // Add capture method
-      capture_method: "automatic",
+      metadata: {
+        basketId: basketModel?.basketId || `basket_${Date.now()}`,
+        customerName:
+          `${customer?.firstName || ""} ${customer?.lastName || ""}`.trim() ||
+          "Guest",
+      },
     };
 
-    // Debug logging for payment intent data
-    console.log("CreatePaymentIntent - Payment Intent Data:", {
-      ...paymentIntentData,
-      // Mask sensitive data
-      shipping: paymentIntentData.shipping ? "present" : "not_present",
+    // Add customer info if available
+    if (customer?.email) {
+      paymentIntentData.receipt_email = customer.email;
+      paymentIntentData.metadata.customerEmail = customer.email;
+    }
+
+    if (customer?.firstName || customer?.lastName) {
+      paymentIntentData.description = `Order for ${customer.firstName || ""} ${
+        customer.lastName || ""
+      }`.trim();
+    }
+
+    if (customer?.streetAddress) {
+      paymentIntentData.shipping = {
+        name: `${customer.firstName || ""} ${customer.lastName || ""}`.trim(),
+        address: {
+          line1: customer.streetAddress,
+          postal_code: customer.postalCode || "",
+          city: customer.city || "",
+          country: customer.country || "BE",
+          state: customer.state || null,
+        },
+      };
+    }
+
+    // Log request data
+    console.log("Creating Payment Intent:", {
+      data: paymentIntentData,
+      idempotencyKey,
     });
 
     const paymentIntent = await getClient().paymentIntents.create(
       paymentIntentData,
       {
-        idempotencyKey, // Add idempotency key to the request
+        idempotencyKey,
       }
     );
 
-    // Log successful creation
-    console.log("Payment Intent Created Successfully:", {
+    console.log("Payment Intent Created:", {
       id: paymentIntent.id,
-      amount: paymentIntent.amount,
-      currency: paymentIntent.currency,
+      clientSecret: paymentIntent.client_secret ? "present" : "missing",
       status: paymentIntent.status,
-      hasMetadata: !!paymentIntent.metadata,
-      hasShipping: !!paymentIntent.shipping,
-      idempotencyKey,
     });
 
     return paymentIntent;
   } catch (error) {
-    // Enhanced error logging
-    console.error("Error creating payment intent:", {
-      error: error.message,
+    // Detailed error logging
+    console.error("Stripe Error:", {
       type: error.type,
       code: error.code,
+      message: error.message,
       param: error.param,
+      requestId: error.requestId,
       ...(error.raw && { raw: error.raw }),
     });
-    throw new Error(`Failed to create payment intent: ${error.message}`);
+
+    throw error; // Let the API handle the error response
   }
 };
