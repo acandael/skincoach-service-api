@@ -10,7 +10,7 @@ export default async function loginMagicLink(req, res) {
     /**
      * Validatee the JWT token and extract the email
      * address and the redirectURLAfterLogin URL to send the
-     * user to afterwards
+     * user to afterwards, some change
      */
     const {
       success,
