@@ -91,11 +91,11 @@ module.exports = async function sendOrderConfirmation(orderId) {
         </mj-section>
         <mj-section>
           <mj-column>
-          <mj-image width="240px" src="https://www.anniek-lambrecht.be/static/logo-anniek-lambrecht-header-2.png" />
+          <mj-image width="240px" src="https://www.anniek-lambrecht.be/static/logo-header-3.jpg" />
         </mj-column>
         <mj-column>
         <mj-text>
-          <p>Anniek Lambrecht Skin Coach<br>
+          <p>Skincenter Anniek Lambrecht<br>
           De Smet De Naeyerlaan 74<br>
           8370 Blankenberge</p>
         </mj-text>
