@@ -6,8 +6,16 @@ module.exports = async function stripeToCrystallizeOrderModel({
   const { getClient } = require("./utils");
 
   const paymentIntent = await getClient().paymentIntents.retrieve(
-    paymentIntentId
+    paymentIntentId,
+    {
+      expand: ['charges.data']
+    }
   );
+
+  // Handle case where charges might not be available yet
+  if (!paymentIntent.charges || !paymentIntent.charges.data || paymentIntent.charges.data.length === 0) {
+    throw new Error(`No charges found for payment intent ${paymentIntentId}. Payment intent status: ${paymentIntent.status}`);
+  }
 
   const { data } = paymentIntent.charges;
   const charge = data[0];
