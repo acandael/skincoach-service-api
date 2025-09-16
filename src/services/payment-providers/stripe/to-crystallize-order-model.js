@@ -5,21 +5,41 @@ module.exports = async function stripeToCrystallizeOrderModel({
 }) {
   const { getClient } = require("./utils");
 
+  // Retrieve payment intent with expanded charges
   const paymentIntent = await getClient().paymentIntents.retrieve(
     paymentIntentId,
     {
-      expand: ['charges.data']
+      expand: ['charges', 'charges.data']
     }
   );
 
   // Handle case where charges might not be available yet
   if (!paymentIntent.charges || !paymentIntent.charges.data || paymentIntent.charges.data.length === 0) {
-    throw new Error(`No charges found for payment intent ${paymentIntentId}. Payment intent status: ${paymentIntent.status}`);
+    // Try to get the latest charge directly if no charges in payment intent
+    const charges = await getClient().charges.list({
+      payment_intent: paymentIntentId,
+      limit: 1
+    });
+
+    if (!charges.data || charges.data.length === 0) {
+      throw new Error(`No charges found for payment intent ${paymentIntentId}. Payment intent status: ${paymentIntent.status}`);
+    }
+
+    // Use the charge from the direct query
+    const charge = charges.data[0];
+
+    // Continue with the charge data
+    return buildOrderModel(charge, paymentIntent, basket, checkoutModel);
   }
 
   const { data } = paymentIntent.charges;
   const charge = data[0];
 
+  return buildOrderModel(charge, paymentIntent, basket, checkoutModel);
+};
+
+// Helper function to build the order model
+function buildOrderModel(charge, paymentIntent, basket, checkoutModel) {
   const customerName = charge.billing_details.name.split(" ");
   let email = charge.receipt_email;
   if (!email && checkoutModel.customer && checkoutModel.customer.addresses) {
@@ -92,4 +112,4 @@ module.exports = async function stripeToCrystallizeOrderModel({
       },
     ],
   };
-};
+}
