@@ -14,28 +14,22 @@ module.exports = async function confirmOrder({
 
   const basket = await basketService.get({ basketModel, context });
 
-  // Verify the payment intent status and confirm if needed
+  // Verify the payment intent status
   const stripe = getClient();
   try {
-    // First retrieve the payment intent to check its status
-    let paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    // Retrieve the payment intent to check its current status
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
-    // If the payment intent is not yet confirmed, confirm it server-side
-    if (paymentIntent.status === 'requires_confirmation') {
-      paymentIntent = await stripe.paymentIntents.confirm(paymentIntentId, {
-        // This will use POST method to confirm the payment intent
-        return_url: `${process.env.NEXT_PUBLIC_URL || 'https://your-domain.com'}/order/confirmation`
-      });
-    }
+    console.log(`Payment intent ${paymentIntentId} current status: ${paymentIntent.status}`);
 
     // Ensure the payment is successful before proceeding
     if (paymentIntent.status !== 'succeeded') {
-      throw new Error(`Payment not completed. Status: ${paymentIntent.status}`);
+      throw new Error(`Payment not completed. Status: ${paymentIntent.status}. Please ensure payment is confirmed on the client side before calling confirmOrder.`);
     }
 
-    console.log(`Payment intent ${paymentIntentId} confirmed successfully with status: ${paymentIntent.status}`);
+    console.log(`Payment intent ${paymentIntentId} verified successfully with status: ${paymentIntent.status}`);
   } catch (error) {
-    console.error('Payment intent verification/confirmation failed:', error);
+    console.error('Payment intent verification failed:', error);
     throw new Error(`Payment verification failed: ${error.message}`);
   }
 
