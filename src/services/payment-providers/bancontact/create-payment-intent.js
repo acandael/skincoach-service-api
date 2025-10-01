@@ -12,13 +12,19 @@ module.exports = async function createPaymentIntent({
 
   // Create the return URL with proper URL encoding for Bancontact
   let returnUrl = confirmationURL;
-  if (confirmationURL && confirmationURL.includes('?checkout_model=')) {
-    // URL encode the entire checkout_model parameter value
-    const urlParts = confirmationURL.split('?checkout_model=');
-    if (urlParts.length === 2) {
-      const baseUrl = urlParts[0];
-      const checkoutModelData = urlParts[1];
-      returnUrl = `${baseUrl}?checkout_model=${encodeURIComponent(checkoutModelData)}`;
+  if (confirmationURL) {
+    // Replace the crystallizeOrderId placeholder with a temporary value that can be handled later
+    // The actual order ID will be passed through payment intent metadata
+    returnUrl = confirmationURL.replace('{crystallizeOrderId}', 'PENDING');
+
+    if (returnUrl.includes('?checkout_model=')) {
+      // URL encode the entire checkout_model parameter value
+      const urlParts = returnUrl.split('?checkout_model=');
+      if (urlParts.length === 2) {
+        const baseUrl = urlParts[0];
+        const checkoutModelData = urlParts[1];
+        returnUrl = `${baseUrl}?checkout_model=${encodeURIComponent(checkoutModelData)}`;
+      }
     }
   }
 
@@ -29,6 +35,7 @@ module.exports = async function createPaymentIntent({
     confirmation_method: 'manual', // Bancontact requires manual confirmation
     metadata: {
       basketId: basketModel?.basketId || `basket_${Date.now()}`,
+      originalConfirmationURL: confirmationURL || '',
     }
   };
 
