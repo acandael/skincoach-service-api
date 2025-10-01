@@ -32,7 +32,7 @@ module.exports = async function createPaymentIntent({
     amount: Math.round(basket.total.gross * 100),
     currency: basket.total.currency.toLowerCase(),
     payment_method_types: ['bancontact'],
-    confirmation_method: 'manual', // Bancontact requires manual confirmation
+    confirmation_method: 'automatic', // Bancontact requires automatic confirmation for redirect-based flows
     metadata: {
       basketId: basketModel?.basketId || `basket_${Date.now()}`,
       returnUrl: returnUrl || '', // Store return URL in metadata for later use during confirmation
