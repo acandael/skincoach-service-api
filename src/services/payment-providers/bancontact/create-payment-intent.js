@@ -35,14 +35,12 @@ module.exports = async function createPaymentIntent({
     confirmation_method: 'manual', // Bancontact requires manual confirmation
     metadata: {
       basketId: basketModel?.basketId || `basket_${Date.now()}`,
-      originalConfirmationURL: confirmationURL || '',
+      returnUrl: returnUrl || '', // Store return URL in metadata for later use during confirmation
     }
   };
 
-  // Add return_url if available (required for Bancontact)
-  if (returnUrl) {
-    paymentIntentData.return_url = returnUrl;
-  }
+  // Note: return_url should be passed during confirmation, not creation
+  console.log('Bancontact paymentIntentData being sent to Stripe:', JSON.stringify(paymentIntentData, null, 2));
 
   const paymentIntent = await getClient().paymentIntents.create(paymentIntentData);
 
