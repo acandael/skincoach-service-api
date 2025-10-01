@@ -8,10 +8,30 @@ module.exports = async function confirmOrder({
   const basketService = require("../../basket-service");
 
   const toCrystallizeOrderModel = require("./to-crystallize-order-model");
+  const { getClient } = require("./utils");
 
   const { basketModel } = checkoutModel;
 
   const basket = await basketService.get({ basketModel, context });
+
+  // Verify the payment intent status
+  const stripe = getClient();
+  try {
+    // Retrieve the payment intent to check its current status
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    console.log(`Bancontact payment intent ${paymentIntentId} current status: ${paymentIntent.status}`);
+
+    // Ensure the payment is successful before proceeding
+    if (paymentIntent.status !== 'succeeded') {
+      throw new Error(`Payment not completed. Status: ${paymentIntent.status}. Please ensure payment is confirmed on the client side before calling confirmOrder.`);
+    }
+
+    console.log(`Bancontact payment intent ${paymentIntentId} verified successfully with status: ${paymentIntent.status}`);
+  } catch (error) {
+    console.error('Bancontact payment intent verification failed:', error);
+    throw new Error(`Payment verification failed: ${error.message}`);
+  }
 
   // Prepares a model valid for Crystallize order intake
   const crystallizeOrderModel = await toCrystallizeOrderModel({
