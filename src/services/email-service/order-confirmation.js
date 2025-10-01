@@ -154,23 +154,30 @@ module.exports = async function sendOrderConfirmation(orderId) {
       </mjml>
     `);
 
+    console.log(`Sending customer confirmation email to: ${email}`);
     await sendEmail({
       to: email,
       subject: "Bestelgegevens",
       html,
     });
+    console.log(`Customer confirmation email sent successfully to: ${email}`);
 
+    console.log(`Sending shop notification email to: info@anniek-lambrecht.be`);
     await sendEmail({
       to: "info@anniek-lambrecht.be",
       subject: "Nieuwe Bestelling",
       html: html2,
     });
+    console.log(`Shop notification email sent successfully`);
 
     return {
       success: true,
     };
   } catch (error) {
-    console.log(error);
+    console.error('Error sending order confirmation email:', error);
+    if (error.response) {
+      console.error('SendGrid API response:', error.response.body);
+    }
     return {
       success: false,
       error,
