@@ -24,6 +24,7 @@
     "or": "^0.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "resend": "^6.1.2",
     "stripe": "^8.130.0"
   },
   "devDependencies": {

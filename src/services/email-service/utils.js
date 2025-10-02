@@ -1,17 +1,26 @@
 const invariant = require("invariant");
+const { Resend } = require('resend');
 
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const EMAIL_FROM = process.env.EMAIL_FROM;
 
+let resendClient;
+
+function getResendClient() {
+  if (!resendClient) {
+    invariant(RESEND_API_KEY, "process.env.RESEND_API_KEY not defined");
+    resendClient = new Resend(RESEND_API_KEY);
+  }
+  return resendClient;
+}
+
 module.exports = {
-  sendEmail(args) {
-    invariant(SENDGRID_API_KEY, "process.env.SENDGRID_API_KEY not defined");
+  async sendEmail(args) {
     invariant(EMAIL_FROM, "process.env.EMAIL_FROM is not defined");
 
-    const sgMail = require("@sendgrid/mail");
-    sgMail.setApiKey(SENDGRID_API_KEY);
+    const resend = getResendClient();
 
-    return sgMail.send({
+    return resend.emails.send({
       from: EMAIL_FROM,
       ...args,
     });
