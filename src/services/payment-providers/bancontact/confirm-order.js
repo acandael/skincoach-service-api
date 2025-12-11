@@ -3,6 +3,10 @@ module.exports = async function confirmOrder({
   checkoutModel,
   context,
 }) {
+  // Debug: Log checkoutModel at entry point
+  console.log('[ConfirmOrder Bancontact] Entry - checkoutModel:', JSON.stringify(checkoutModel, null, 2));
+  console.log('[ConfirmOrder Bancontact] Entry - metadata:', JSON.stringify(checkoutModel?.metadata, null, 2));
+
   const crystallize = require("../../crystallize");
   const emailService = require("../../email-service");
   const basketService = require("../../basket-service");
