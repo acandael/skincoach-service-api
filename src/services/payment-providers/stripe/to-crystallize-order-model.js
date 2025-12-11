@@ -5,6 +5,10 @@ module.exports = async function stripeToCrystallizeOrderModel({
 }) {
   const { getClient } = require("./utils");
 
+  // Debug logging to trace metadata
+  console.log('[OrderModel] checkoutModel received:', JSON.stringify(checkoutModel, null, 2));
+  console.log('[OrderModel] checkoutModel.metadata:', JSON.stringify(checkoutModel?.metadata, null, 2));
+
   // Retrieve payment intent with expanded charges
   const paymentIntent = await getClient().paymentIntents.retrieve(
     paymentIntentId,
