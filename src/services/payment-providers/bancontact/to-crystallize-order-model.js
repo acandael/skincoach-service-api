@@ -225,12 +225,7 @@ function buildOrderModel(charge, paymentIntent, basket, checkoutModel) {
           paymentMethodId: charge.payment_method || '',
           paymentIntentId: charge.payment_intent || '',
           subscriptionId: charge.subscription || '',
-          metadata: JSON.stringify({
-            chargeId: charge.id,
-            receiptUrl: charge.receipt_url,
-            bancontactBank: safeGet(charge, 'payment_method_details.bancontact.bank_name', ''),
-            bancontactIban: safeGet(charge, 'payment_method_details.bancontact.iban_last4', ''),
-          }),
+          metadata: "bancontact",
         },
       },
     ],

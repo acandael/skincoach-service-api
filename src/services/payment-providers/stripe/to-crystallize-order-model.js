@@ -188,10 +188,7 @@ function buildOrderModel(charge, paymentIntent, basket, checkoutModel) {
           paymentMethodId: charge.payment_method || '',
           paymentIntentId: charge.payment_intent || '',
           subscriptionId: charge.subscription || '',
-          metadata: JSON.stringify({
-            chargeId: charge.id,
-            receiptUrl: charge.receipt_url,
-          }),
+          metadata: "card",
         },
       },
     ],
