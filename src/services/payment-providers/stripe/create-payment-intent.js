@@ -34,6 +34,9 @@ module.exports = async function createPaymentIntent({
       ? `pi_${basketModel.basketId}_${basket.total.gross}`
       : `pi_${Date.now()}_${basket.total.gross}`;
 
+    // Serialize checkoutModel for webhook fallback
+    const checkoutModelMetadata = serializeCheckoutModelForMetadata(checkoutModel);
+
     // Basic payment intent data
     const paymentIntentData = {
       amount: Math.round(basket.total.gross * 100),
@@ -45,6 +48,7 @@ module.exports = async function createPaymentIntent({
         customerName:
           `${customer?.firstName || ""} ${customer?.lastName || ""}`.trim() ||
           "Guest",
+        ...checkoutModelMetadata, // Include serialized checkoutModel for webhook fallback
       },
     };
 
@@ -107,3 +111,40 @@ module.exports = async function createPaymentIntent({
     throw error; // Let the API handle the error response
   }
 };
+
+/**
+ * Serialize checkoutModel for storage in Stripe metadata
+ * Stripe has a 500 character limit per metadata value, so we chunk the data
+ * @param {Object} checkoutModel - The checkout model to serialize
+ * @returns {Object} - Metadata object with chunked checkoutModel
+ */
+function serializeCheckoutModelForMetadata(checkoutModel) {
+  const metadata = {};
+  const CHUNK_SIZE = 490; // Leave some margin for safety
+
+  try {
+    const serialized = JSON.stringify(checkoutModel);
+    const chunks = [];
+
+    for (let i = 0; i < serialized.length; i += CHUNK_SIZE) {
+      chunks.push(serialized.slice(i, i + CHUNK_SIZE));
+    }
+
+    // Stripe allows max 50 metadata keys, so we limit to 40 chunks (leaving room for other metadata)
+    const maxChunks = Math.min(chunks.length, 40);
+
+    if (chunks.length > maxChunks) {
+      console.warn(`[createPaymentIntent] checkoutModel too large, truncating from ${chunks.length} to ${maxChunks} chunks`);
+    }
+
+    for (let i = 0; i < maxChunks; i++) {
+      metadata[`checkoutModel_${i}`] = chunks[i];
+    }
+
+    console.log(`[createPaymentIntent] Stored checkoutModel in ${maxChunks} metadata chunks`);
+  } catch (error) {
+    console.error('[createPaymentIntent] Failed to serialize checkoutModel:', error);
+  }
+
+  return metadata;
+}
